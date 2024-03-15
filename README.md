@@ -1,66 +1,94 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Общее описание API проекта
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Необходимо реализовать систему принятия и обработки заявок пользователей с сайта. Любой пользователь может отправить данные по публичному API, реализованному нами, оставив заявку с каким-то текстом. Затем заявка рассматривается ответственным лицом и ей устанавливается статус "Завершено". Чтобы установить этот статус, ответственное лицо должно оставить комментарий. Пользователь должен получить свой ответ по email. При этом, ответственное лицо должно иметь возможность получить список заявок, отфильтровать их по статусу и по дате, а также иметь возможность ответить задающему вопрос через email.
 
-## About Laravel
+### Заявка
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- id: Уникальный идентификатор
+- name: Имя пользователя - строка, обязательная
+- email: Email пользователя - строка, обязательная
+- status: Статус - enum("Active", "Resolved")
+- message: Сообщение пользователя - текст, обязательный
+- comment: Ответ ответственного лица - текст, обязательный, если статус Resolved
+- created_at: Время создания заявки - timestamp или datetime
+- updated_at: Время ответа на заявку
+- 
+### Пользователь (User)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- id: Уникальный идентификатор
+- name: Имя пользователя - строка
+- email: Email пользователя - строка, уникальное значение
+- email_verified_at: Дата и время подтверждения email (nullable)
+- password: Пароль пользователя - строка
+- remember_token: Токен 
+- created_at: Время создания записи - timestamp или datetime
+- updated_at: Время обновления записи - timestamp или datetime
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Endpointы API
 
-## Learning Laravel
+Методы API должны быть документированы каким-нибудь средством документации на ваш выбор. Предпочтительно, с наличием песочницы.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- GET /requests/ - получение заявок ответственным лицом, с фильтрацией по статусу
+- PUT /requests/{id}/ - ответ на конкретную задачу ответственным лицом
+- POST /requests/ - отправка заявки пользователями системы
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Установка и запуск
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. Клонируйте проект:
 
-## Laravel Sponsors
+    ```bash
+    git clone https://github.com/IgoriLLa-lab/api-div-example.git
+    ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+2. Запустите Docker Compose:
 
-### Premium Partners
+    ```bash
+    docker-compose up -d
+    ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+3. После успешного запуска контейнеров доступны следующие ресурсы:
 
-## Contributing
+    - div_nginx — веб-сервер
+    - app_div_project — http://localhost:8002/
+    - div_db — база данных
+    - div_mail — сервер тестирования отправки email (mailpit) http://localhost:8025/
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+4. Войдите в контейнер с приложением:
 
-## Code of Conduct
+    ```bash
+    docker exec -it app_div_project sh
+    ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+5. Установите зависимости через Composer:
 
-## Security Vulnerabilities
+    ```bash
+    composer install
+    ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+6. Сгенерируйте ключ приложения:
 
-## License
+    ```bash
+    php artisan key:generate
+    ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+7. Настройте `.env` файл на основе `env.example`.
+
+8. Выполните миграции для базы данных:
+
+    ```bash
+    php artisan migrate
+    ```
+   
+9. http://localhost:8002/register регистрируем пользователя 1 раз и это будет admin
+
+10. http://localhost:8002/dashboard получаем токе который используей в Postman коллекции
+
+## Используемые технологии
+
+- Docker Compose
+- PHP 8.2
+- Nginx
+- Laravel 11
+- MySQL 8.0
+- [Mailpit](https://github.com/axllent/mailpit) для проверки отправки email
+- Postman (для тестирования API)
